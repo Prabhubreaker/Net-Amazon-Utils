@@ -10,7 +10,7 @@ WriteMakefile(
     ABSTRACT_FROM    => 'lib/Net/Amazon/Utils.pm',
     LICENSE          => 'gpl, artistic',
     PL_FILES         => {},
-    MIN_PERL_VERSION => 5.006,
+    MIN_PERL_VERSION => 5.10.0,
     CONFIGURE_REQUIRES => {
         'ExtUtils::MakeMaker' => 0,
     },
@@ -18,8 +18,9 @@ WriteMakefile(
         'Test::More' => 0,
     },
     PREREQ_PM => {
-        #'ABC'              => 1.6,
-        #'Foo::Bar::Module' => 5.0401,
+				'Carp' => 0,
+				'LWP::Simple' => 0,
+				'XML::Simple' => 0,
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Net-Amazon-Utils-*' },
