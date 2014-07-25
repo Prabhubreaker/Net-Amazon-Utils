@@ -55,7 +55,13 @@ sub new {
 		# do not load updated file from the Internet, defaults to true.
 		no_inet => $no_inet,
 		# be well behaved and tell who we are.
-		ua     => LWP::UserAgent->new( agent=> __PACKAGE__ . '/' . $VERSION ),
+		# use more reasonable 21st century Internet timeout
+		# do not accept redirects
+		ua     => LWP::UserAgent->new(
+			agent		=> __PACKAGE__ . '/' . $VERSION,
+			timeout => 30,
+			max_redirect => 0,
+		),
 	};
 	return bless $self, $class;
 }
@@ -212,7 +218,8 @@ sub has_https_endpoint {
 
 =head2 _load_regions
 
-Loads regions from local cached file or the internet, non blocking until needed.
+Loads regions from local cached file or the Internet.
+If Internet fails local cached file is used.
 
 =cut
 
@@ -221,10 +228,35 @@ sub _load_regions {
 
 	if ( $force || !defined $self->{regions} ) {
 		if ( $self->{no_inet} ) {
-			$self->{regions} = XML::Simple::XMLin( $self->{local_region_file} )
+			eval {
+				$self->{regions} = $self->{ua}->XML::Simple::XMLin( $self->{local_region_file} )
+			};
+			if ( $@ ) {
+				carp "Processing XML failed with error $@";
+			}
 		} else {
-			my $xml = LWP::Simple::get( $self->{remote_region_file} );
-			$self->{regions} = XML::Simple::XMLin( $xml );
+			my $error;
+			my $response = $self->{ua}->get( $self->{remote_region_file} );
+			if ( $response->is_success ) {
+				eval {
+					$self->{regions} = XML::Simple::XMLin( $response->decoded_content );
+				};
+				if ( $@ ) {
+					carp "Processing XML failed with error $@";
+					$error = 1;
+				}
+			} else {
+				carp "Getting updated regions failed with " . $response->status_line;
+				$error = 1;
+			}
+			# Retry locally on errors
+			if ( $error ) {
+				my $old_no_inet = $self->{no_inet};
+				carp "Getting regions file from Internet failed will use local cache. Check your Internet connection...";
+				$self->{no_inet} = 1;
+				$self->_load_regions();
+				$self->{no_inet} = $old_no_inet
+			}
 		}
 	}
 }
