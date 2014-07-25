@@ -48,14 +48,38 @@ sub new {
 	$no_cache = 0 unless defined $no_cache;
 
 	my $self = {
-		# do not load updated file from the Internet, defaults to true.
-		no_inet => $no_inet,
+		remote_region_file => 'https://raw.githubusercontent.com/aws/aws-sdk-android-v2/master/src/com/amazonaws/regions/regions.xml',
+		local_region_file => 'regions.xml',
 		# do not cache regions between calls, does not affect Internet caching, defaults to false.
 		no_cache => $no_cache,
+		# do not load updated file from the Internet, defaults to true.
+		no_inet => $no_inet,
 		# be well behaved and tell who we are.
 		ua     => LWP::Simple->new( agent=> __PACKAGE__ . '/' . $VERSION ),
 	};
 	return bless $self, $class;
+}
+
+=head2 fetch_regions_update
+
+Fetch regions file from the internet even if no_inet was specified when
+intanciating the object.
+
+=cut
+
+sub fetch_region_update {
+	my ( $self ) = @_;
+
+	if ( $self->{no_cache} ) {
+		# Cached regions will net be fetched
+		carp 'Fetching updated region update is useless unless no_cache is false. Still I will comply to your orders in case you more intelligent.';
+	} else {
+		# Backup and restore Internet connection selection.
+		my $old_no_inet = $self->{no_inet};
+		# Force loading
+		$self->_load_regions( 1 );
+		$self->{no_inet} = $old_no_inet;
+	}
 }
 
 =head2 get_regions
@@ -81,14 +105,14 @@ Loads regions from local cached file or the internet, non blocking until needed.
 =cut
 
 sub _load_regions {
-	my ( $self ) = @_;
+	my ( $self, $force ) = @_;
 
-	unless ( defined $self->{regions} ) {
+	if ( $force || !defined $self->{regions} ) {
 		if ( $self->{no_inet} ) {
-			$self->{regions} = XML::Simple::XMLin( 'regions.xml' )
+			$self->{regions} = XML::Simple::XMLin( $self->{local_region_file} )
 		} else {
-			my $xml = LWP::Simple::get( 'https://raw.githubusercontent.com/aws/aws-sdk-android-v2/master/src/com/amazonaws/regions/regions.xml' );
-			$self->{regions} = XML::Simple::XMLin( 'regions.xml' );
+			my $xml = LWP::Simple::get( $self->{remote_region_file} );
+			$self->{regions} = XML::Simple::XMLin( $xml );
 		}
 	}
 }
