@@ -5,6 +5,7 @@ use strict;
 use warnings FATAL => 'all';
 use Carp;
 use LWP::Simple;
+use XML::Simple;
 
 =head1 NAME
 
@@ -17,7 +18,6 @@ Version 0.01
 =cut
 
 our $VERSION = '0.01';
-
 
 =head1 SYNOPSIS
 
@@ -37,18 +37,52 @@ if you don't export anything, such as for a purely object-oriented module.
 
 =head1 SUBROUTINES/METHODS
 
-=head2 function1
+=head2 new
 
 =cut
 
-sub function1 {
+sub new {
+	my ( $class, $cache_regions ) = @_;
+
+	my $self = {
+		# be well behaved and tell who we are
+		cache_regions => $cache_regions,
+		ua     => LWP::Simple->new( agent=> __PACKAGE__ . '/' . $VERSION ),
+	};
+	return bless $self, $class;
 }
 
-=head2 function2
+=head2 get_regions
 
 =cut
 
-sub function2 {
+sub get_regions {
+	my ( $self ) = @_;
+
+	$self->_load_regions() unless defined $self->{regions}
+
+	$self->_unload_regions();
+}
+
+
+
+=head1 Internal Functions
+
+=head2 _load_regions
+
+=cut
+
+=head2 _unload_regions
+
+Unloads regions recovering memory unless object has been instantiated with
+cache_regions set to any true value.
+
+=cut
+
+sub _unload_regions {
+	my ( $self ) = @_;
+
+	$self->{regions} = undef unless $self->{cache_regions};
 }
 
 =head1 AUTHOR
