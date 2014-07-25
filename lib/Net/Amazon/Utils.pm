@@ -1,12 +1,14 @@
 package Net::Amazon::Utils;
 
-use 5.006;
+use v5.10.0;
 use strict;
 use warnings FATAL => 'all';
+use Carp;
+use LWP::Simple;
 
 =head1 NAME
 
-Net::Amazon::Utils - The great new Net::Amazon::Utils!
+Net::Amazon::Utils - Implementation of a set of utilities to help in developing Amazon web service modules in Perl.
 
 =head1 VERSION
 
@@ -59,15 +61,11 @@ Please report any bugs or feature requests to C<bug-net-amazon-utils at rt.cpan.
 the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Net-Amazon-Utils>.  I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
-
-
-
 =head1 SUPPORT
 
 You can find documentation for this module with the perldoc command.
 
     perldoc Net::Amazon::Utils
-
 
 You can also look for information at:
 
@@ -91,16 +89,17 @@ L<http://search.cpan.org/dist/Net-Amazon-Utils/>
 
 =back
 
-
 =head1 ACKNOWLEDGEMENTS
-
 
 =head1 LICENSE AND COPYRIGHT
 
 Copyright 2014 Gonzalo Barco.
 
-This program is released under the following license: gpl, artistic
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
 
+See http://dev.perl.org/licenses/ for more information.
 
 =cut
 
