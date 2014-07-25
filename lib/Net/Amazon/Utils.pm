@@ -42,11 +42,17 @@ if you don't export anything, such as for a purely object-oriented module.
 =cut
 
 sub new {
-	my ( $class, $cache_regions ) = @_;
+	my ( $class, $no_cache, $no_inet ) = @_;
+
+	$no_inet = 1 unless defined $no_inet;
+	$no_cache = 0 unless defined $no_cache;
 
 	my $self = {
-		# be well behaved and tell who we are
-		cache_regions => $cache_regions,
+		# do not load updated file from the Internet, defaults to true.
+		no_inet => $no_inet,
+		# do not cache regions between calls, does not affect Internet caching, defaults to false.
+		no_cache => $no_cache,
+		# be well behaved and tell who we are.
 		ua     => LWP::Simple->new( agent=> __PACKAGE__ . '/' . $VERSION ),
 	};
 	return bless $self, $class;
@@ -59,18 +65,33 @@ sub new {
 sub get_regions {
 	my ( $self ) = @_;
 
-	$self->_load_regions() unless defined $self->{regions}
+	$self->_load_regions();
+
+
 
 	$self->_unload_regions();
 }
-
-
 
 =head1 Internal Functions
 
 =head2 _load_regions
 
+Loads regions from local cached file or the internet, non blocking until needed.
+
 =cut
+
+sub _load_regions {
+	my ( $self ) = @_;
+
+	unless ( defined $self->{regions} ) {
+		if ( $self->{no_inet} ) {
+			$self->{regions} = XML::Simple::XMLin( 'regions.xml' )
+		} else {
+			my $xml = LWP::Simple::get( 'https://raw.githubusercontent.com/aws/aws-sdk-android-v2/master/src/com/amazonaws/regions/regions.xml' );
+			$self->{regions} = XML::Simple::XMLin( 'regions.xml' );
+		}
+	}
+}
 
 =head2 _unload_regions
 
