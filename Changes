@@ -1,0 +1,5 @@
+Revision history for Net-Amazon-Utils
+
+0.1     2014-07-25
+        First version, basic support for com.amazonaws.region.Region endpoint
+        recognition and region lists.
