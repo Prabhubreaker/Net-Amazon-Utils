@@ -4,7 +4,7 @@ use v5.10.0;
 use strict;
 use warnings FATAL => 'all';
 use Carp;
-use LWP::Simple;
+use LWP::UserAgent;
 use XML::Simple;
 
 =head1 NAME
@@ -55,7 +55,7 @@ sub new {
 		# do not load updated file from the Internet, defaults to true.
 		no_inet => $no_inet,
 		# be well behaved and tell who we are.
-		ua     => LWP::Simple->new( agent=> __PACKAGE__ . '/' . $VERSION ),
+		ua     => LWP::UserAgent->new( agent=> __PACKAGE__ . '/' . $VERSION ),
 	};
 	return bless $self, $class;
 }
