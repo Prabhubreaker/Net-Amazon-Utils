@@ -1,8 +1,9 @@
 Net-Amazon-Utils
 
-This module is a set of support functions to recognize regions, available
-services and endpoints of AWS webservices loosely based in
-com.amazonaws.regions.Region.
+This module is a set of support functions to aid in developing Amazon web
+service modules. Currently it is a set of support functions mainly to recognize
+regions, available services and endpoints of AWS webservices loosely based in
+com.amazonaws.regions.Region at http://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/regions/Region.html
 
 Most data comes from aws-sdk-android-v2 git hub repo regions file:
 https://raw.githubusercontent.com/aws/aws-sdk-android-v2/master/src/com/amazonaws/regions/regions.xml
