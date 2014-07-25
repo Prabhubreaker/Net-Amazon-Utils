@@ -96,6 +96,118 @@ sub get_regions {
 	$self->_unload_regions();
 }
 
+=head2 get_services
+
+=cut
+
+sub get_services {
+	my ( $self ) = @_;
+
+	$self->_load_regions();
+
+
+
+	$self->_unload_regions();
+}
+
+=head2 get_service_endpoints
+
+=cut
+
+sub get_service_endpoints {
+	my ( $self ) = @_;
+
+	$self->_load_regions();
+
+
+
+	$self->_unload_regions();
+}
+
+=head2 get_http_support
+
+=cut
+
+sub get_http_support {
+	my ( $self ) = @_;
+
+	$self->_load_regions();
+
+
+
+	$self->_unload_regions();
+}
+
+=head2 get_https_support
+
+=cut
+
+sub get_https_support  {
+	my ( $self ) = @_;
+
+	$self->_load_regions();
+
+
+
+	$self->_unload_regions();
+}
+
+=head2 get_service_endpoint
+
+=cut
+
+sub get_service_endpoint {
+	my ( $self ) = @_;
+
+	$self->_load_regions();
+
+
+
+	$self->_unload_regions();
+}
+
+=head2 is_service_supported
+
+=cut
+
+sub is_service_supported {
+	my ( $self ) = @_;
+
+	$self->_load_regions();
+
+
+
+	$self->_unload_regions();
+}
+
+=head2 has_http_endpoint
+
+=cut
+
+sub has_http_endpoint {
+	my ( $self ) = @_;
+
+	$self->_load_regions();
+
+
+
+	$self->_unload_regions();
+}
+
+=head2 has_https_endpoint
+
+=cut
+
+sub has_https_endpoint {
+	my ( $self ) = @_;
+
+	$self->_load_regions();
+
+
+
+	$self->_unload_regions();
+}
+
 =head1 Internal Functions
 
 =head2 _load_regions
