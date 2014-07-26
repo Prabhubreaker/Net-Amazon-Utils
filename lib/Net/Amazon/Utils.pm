@@ -5,7 +5,6 @@ use strict;
 use warnings FATAL => 'all';
 use Carp;
 use LWP::UserAgent;
-use XML::Simple;
 
 =head1 NAME
 
@@ -49,7 +48,6 @@ sub new {
 
 	my $self = {
 		remote_region_file => 'https://raw.githubusercontent.com/aws/aws-sdk-android-v2/master/src/com/amazonaws/regions/regions.xml',
-		local_region_file => 'regions.xml',
 		# do not cache regions between calls, does not affect Internet caching, defaults to false.
 		no_cache => $no_cache,
 		# do not load updated file from the Internet, defaults to true.
@@ -94,10 +92,25 @@ sub fetch_region_update {
 
 sub get_regions {
 	my ( $self ) = @_;
+	my @regions;
 
 	$self->_load_regions();
 
+	return keys $self->{regions};
 
+	$self->_unload_regions();
+}
+
+=head2 get_regions_raw
+
+=cut
+
+sub get_regions_raw {
+	my ( $self ) = @_;
+
+	$self->_load_regions();
+
+	return $self->{regions};
 
 	$self->_unload_regions();
 }
@@ -272,6 +285,18 @@ sub _unload_regions {
 	my ( $self ) = @_;
 
 	$self->{regions} = undef unless $self->{cache_regions};
+}
+
+=head2 _get_remote_regions_file_uri
+
+Returns the uri of the remote regions.xml file.
+
+=cut
+
+sub _get_remote_regions_file_uri {
+	my ( $self ) = @_;
+
+	return $self->{remote_region_file};
 }
 
 =head1 AUTHOR
