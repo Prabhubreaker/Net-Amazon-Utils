@@ -75,8 +75,9 @@ sub fetch_region_update {
 	my ( $self ) = @_;
 
 	if ( $self->{no_cache} ) {
-		# Cached regions will net be fetched
+		# Cached regions will not be fetched
 		carp 'Fetching updated region update is useless unless no_cache is false. Still I will comply to your orders in case you more intelligent.';
+		$self->_load_regions( 1 );
 	} else {
 		# Backup and restore Internet connection selection.
 		my $old_no_inet = $self->{no_inet};
