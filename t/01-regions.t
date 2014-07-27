@@ -7,7 +7,7 @@ use lib '../lib';
 BEGIN {
 	use_ok( 'Carp' );
 	use_ok( 'XML::Simple' );
-	use_ok( 'LWP::Useragent' );
+	use_ok( 'LWP::UserAcgent' );
 	use_ok( 'Net::Amazon::Utils' );
 	use_ok( 'Net::Amazon::Utils::Regions' );
 }
