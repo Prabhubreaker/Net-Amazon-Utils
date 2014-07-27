@@ -7,24 +7,18 @@ use LWP::Simple;
 use XML::Simple;
 use Data::Dumper;
 
-my $utils = Net::Amazon::Utils->new();
+my $utils = Net::Amazon::Utils->new(0,0);
 
 my $uri = $utils->_get_remote_regions_file_uri();
 
+my $regions = $utils->_get_regions_file_raw();
+
 print STDERR "Will download $uri\n";
-
-my $xml = LWP::Simple::get( $uri ) || die("Could not update regions.");
-
-my $regions = XML::Simple::XMLin( $xml,
-		KeyAttr => {Region => 'Name', Endpoint=>'ServiceName', Service => 'Name', }
-);
 
 print STDERR "Will try to write updated class file.\n";
 
 mkdir 'lib/Net/Amazon/Utils';
 
-# This should be a big file...
-warn "Size of region file looks really suspicious." if ( length $xml < 10000 );
 
 open ( LIB, '>lib/Net/Amazon/Utils/Regions.pm' ) || die("Could not open Regions module for writing.");
 
@@ -54,16 +48,4 @@ eval {
 };
 die( $@ ) if ( $@ );
 
-# Check for some format
-# Check some regions and services that should exists unless all hell broke loose
-
-print "Looks good\n." if (
-	defined $new_regions->{Regions} &&
-	defined $new_regions->{Regions}->{'us-east-1'} &&
-	defined $new_regions->{Regions}->{'us-west-1'} &&
-	defined $new_regions->{Regions}->{'us-west-2'} &&
-	defined $new_regions->{Services} &&
-	defined $new_regions->{Services}->{ec2} &&
-	defined $new_regions->{Services}->{sqs} &&
-	defined $new_regions->{Services}->{glacier}
-);
+print "Looks good\n.";
