@@ -220,6 +220,7 @@ sub has_https_endpoint {
 
 Loads regions from local cached file or the Internet.
 If Internet fails local cached file is used.
+If loading of new region definitions fail, old regions remain unaffected.
 
 =cut
 
@@ -231,7 +232,8 @@ sub _load_regions {
 		my $new_regions;
 		if ( $self->{no_inet} ) {
 			eval {
-				$new_regions = $self->{ua}->XML::Simple::XMLin( $self->{local_region_file}, @xml_options );
+				require Net::Amazon::Utils::Regions;
+				$new_regions = Net::Amazon::Utils::Regions::get_regions_data();
 			};
 			if ( $@ ) {
 				carp "Processing XML failed with error $@";
