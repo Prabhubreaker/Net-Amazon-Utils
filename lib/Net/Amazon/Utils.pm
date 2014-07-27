@@ -5,6 +5,8 @@ use strict;
 use warnings FATAL => 'all';
 use Carp;
 use LWP::UserAgent;
+use LWP::Protocol::https;
+
 
 =head1 NAME
 
@@ -47,7 +49,7 @@ sub new {
 	$no_cache = 0 unless defined $no_cache;
 
 	my $self = {
-		remote_region_file => 'https://raw.githubusercontent.com/aws/aws-sdk-android-v2/master/src/com/amazonaws/regions/regions.xml',
+		remote_region_file => 'http://raw.githubusercontent.com/aws/aws-sdk-android-v2/master/src/com/amazonaws/regions/regions.xml',
 		# do not cache regions between calls, does not affect Internet caching, defaults to false.
 		no_cache => $no_cache,
 		# do not load updated file from the Internet, defaults to true.
@@ -97,7 +99,7 @@ sub get_regions {
 
 	$self->_load_regions();
 
-	return keys $self->{regions};
+	return keys $self->{regions}->{Regions};
 
 	$self->_unload_regions();
 }
@@ -243,7 +245,7 @@ sub _load_regions {
 			my $response = $self->{ua}->get( $self->{remote_region_file} );
 			if ( $response->is_success ) {
 				# This should be a big file...
-				warn "Size of region file looks really suspicious." if ( length $response->decoded_content < 10000 );
+				carp "Size of region file looks really suspicious." if ( length $response->decoded_content < 10000 );
 				eval {
 					$new_regions = XML::Simple::XMLin( $response->decoded_content, @xml_options );
 				};
@@ -264,7 +266,24 @@ sub _load_regions {
 				$self->{no_inet} = $old_no_inet
 			}
 		}
-		$self->{regions} = $new_regions if ( defined $new_regions );
+		# Check that some "trustable" regions and services exist.
+		if ( defined $new_regions &&
+					defined $new_regions->{Regions} &&
+					defined $new_regions->{Regions}->{Region}->{'us-east-1'} &&
+					defined $new_regions->{Regions}->{Region}->{'us-west-1'} &&
+					defined $new_regions->{Regions}->{Region}->{'us-west-2'} &&
+					defined $new_regions->{Services} &&
+					defined $new_regions->{Services}->{Service}->{ec2} &&
+					defined $new_regions->{Services}->{Service}->{sqs} &&
+					defined $new_regions->{Services}->{Service}->{glacier}
+		) {
+			$new_regions->{Regions} = $new_regions->{Regions}->{Region};
+			$new_regions->{Services} = $new_regions->{Services}->{Service};
+			
+			$self->{regions} = $new_regions if ( defined $new_regions );
+		} else {
+			croak "Region file format cannot be trusted.";
+		}
 	}
 }
 
