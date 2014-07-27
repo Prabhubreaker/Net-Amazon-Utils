@@ -242,6 +242,8 @@ sub _load_regions {
 			my $error;
 			my $response = $self->{ua}->get( $self->{remote_region_file} );
 			if ( $response->is_success ) {
+				# This should be a big file...
+				warn "Size of region file looks really suspicious." if ( length $response->decoded_content < 10000 );
 				eval {
 					$new_regions = XML::Simple::XMLin( $response->decoded_content, @xml_options );
 				};
