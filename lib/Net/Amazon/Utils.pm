@@ -102,20 +102,6 @@ sub get_regions {
 	$self->_unload_regions();
 }
 
-=head2 get_regions_raw
-
-=cut
-
-sub get_regions_raw {
-	my ( $self ) = @_;
-
-	$self->_load_regions();
-
-	return $self->{regions};
-
-	$self->_unload_regions();
-}
-
 =head2 get_services
 
 =cut
@@ -239,11 +225,13 @@ If Internet fails local cached file is used.
 
 sub _load_regions {
 	my ( $self, $force ) = @_;
-
+	
 	if ( $force || !defined $self->{regions} ) {
+		my @xml_options = [ KeyAttr => {Region => 'Name', Endpoint=>'ServiceName', Service => 'Name' } ];
+		my $new_regions;
 		if ( $self->{no_inet} ) {
 			eval {
-				$self->{regions} = $self->{ua}->XML::Simple::XMLin( $self->{local_region_file} )
+				$new_regions = $self->{ua}->XML::Simple::XMLin( $self->{local_region_file}, @xml_options );
 			};
 			if ( $@ ) {
 				carp "Processing XML failed with error $@";
@@ -253,7 +241,7 @@ sub _load_regions {
 			my $response = $self->{ua}->get( $self->{remote_region_file} );
 			if ( $response->is_success ) {
 				eval {
-					$self->{regions} = XML::Simple::XMLin( $response->decoded_content );
+					$new_regions = XML::Simple::XMLin( $response->decoded_content, @xml_options );
 				};
 				if ( $@ ) {
 					carp "Processing XML failed with error $@";
@@ -272,6 +260,7 @@ sub _load_regions {
 				$self->{no_inet} = $old_no_inet
 			}
 		}
+		$self->{regions} = $new_regions if ( defined $new_regions );
 	}
 }
 
@@ -298,6 +287,20 @@ sub _get_remote_regions_file_uri {
 	my ( $self ) = @_;
 
 	return $self->{remote_region_file};
+}
+
+=head2 get_regions_file_raw
+
+=cut
+
+sub _get_regions_file_raw {
+	my ( $self ) = @_;
+
+	$self->_load_regions();
+
+	return $self->{regions};
+
+	$self->_unload_regions();
 }
 
 =head1 AUTHOR
