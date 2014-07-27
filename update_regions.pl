@@ -3,8 +3,6 @@ use warnings FATAL => 'all';
 use lib './lib';
 
 use Net::Amazon::Utils;
-use LWP::Simple;
-use XML::Simple;
 use Data::Dumper;
 
 my $utils = Net::Amazon::Utils->new(0,0);
@@ -18,7 +16,6 @@ print STDERR "Will download $uri\n";
 print STDERR "Will try to write updated class file.\n";
 
 mkdir 'lib/Net/Amazon/Utils';
-
 
 open ( LIB, '>lib/Net/Amazon/Utils/Regions.pm' ) || die("Could not open Regions module for writing.");
 
