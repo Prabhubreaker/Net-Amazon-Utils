@@ -2,7 +2,7 @@ package Net::Amazon::Utils;
 
 use v5.10.0;
 use strict;
-use warnings FATAL => 'all';
+use warnings;# FATAL => 'all';
 use Carp;
 use LWP::UserAgent;
 use LWP::Protocol::https;
@@ -89,6 +89,14 @@ sub fetch_region_update {
 	}
 }
 
+=head2 get_domain
+
+=cut
+
+sub get_domain {
+	return 'amazonaws.com';
+}
+
 =head2 get_regions
 
 =cut
@@ -113,49 +121,93 @@ sub get_services {
 
 	$self->_load_regions();
 
-
+	return keys $self->{regions}->{Services};
 
 	$self->_unload_regions();
 }
 
 =head2 get_service_endpoints
 
+Returns a list of the available services endpoints.
+
 =cut
 
 sub get_service_endpoints {
-	my ( $self ) = @_;
+	my ( $self, $service ) = @_;
 
 	$self->_load_regions();
-
-
-
+	
+	my @service_endpoints;
+	
+	unless ( defined $self->{regions}->{ServiceEndpoints} ) {
+		foreach my $region ( keys $self->{regions}->{Regions} ) {
+			push @service_endpoints, $self->{regions}->{Regions}->{$region}->{Endpoint}->{$service}->{Hostname}
+				if (
+					defined $self->{regions}->{Regions}->{$region}->{Endpoint}->{$service}
+				);
+		}
+		$self->{regions}->{ServiceEndpoints} = \@service_endpoints;
+	}
+	
+	return @{$self->{regions}->{ServiceEndpoints}};
+	
 	$self->_unload_regions();
 }
 
 =head2 get_http_support
 
+Returns a list of the available http services endpoints.
+
 =cut
 
 sub get_http_support {
-	my ( $self ) = @_;
+	my ( $self, $service ) = @_;
 
 	$self->_load_regions();
-
-
+	
+	my @http_support;
+	
+	unless ( defined $self->{regions}->{HttpSupport}->{$service} ) {
+		foreach my $region ( keys $self->{regions}->{Regions} ) {
+			push @http_support, $self->{regions}->{Regions}->{$region}->{Endpoint}->{$service}->{Hostname}
+				if (
+					defined $self->{regions}->{Regions}->{$region}->{Endpoint}->{$service} &&
+					$self->{regions}->{Regions}->{$region}->{Endpoint}->{$service}->{Http} eq 'true'
+				);
+		}
+		$self->{regions}->{HttpSupport}->{$service} = \@http_support;
+	}
+	
+	return @{$self->{regions}->{HttpSupport}->{$service}};
 
 	$self->_unload_regions();
 }
 
 =head2 get_https_support
 
+Returns a list of the available https services endpoints.
+
 =cut
 
 sub get_https_support  {
-	my ( $self ) = @_;
+	my ( $self, $service ) = @_;
 
 	$self->_load_regions();
-
-
+	
+	my @https_support;
+	
+	unless ( defined $self->{regions}->{HttpSupport} && defined $self->{regions}->{HttpsSupport}->{$service} ) {
+		foreach my $region ( keys $self->{regions}->{Regions} ) {
+			push @https_support, $self->{regions}->{Regions}->{$region}->{Endpoint}->{$service}->{Hostname}
+				if (
+					defined $self->{regions}->{Regions}->{$region}->{Endpoint}->{$service} &&
+					$self->{regions}->{Regions}->{$region}->{Endpoint}->{$service}->{Https} eq 'true'
+				);
+		}
+		$self->{regions}->{HttpsSupport}->{$service} = \@https_support;
+	}
+	
+	return @{$self->{regions}->{HttpsSupport}->{$service}};
 
 	$self->_unload_regions();
 }
