@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 10;
+use Test::More tests => 28;
 
 use lib '../lib';
 
@@ -43,11 +43,17 @@ ok( scalar $utils->get_service_endpoints('glacier') > 0, 'Service endpoints for 
 
 # Test endpoint protocol support
 
-ok( scalar $utils->get_http_support > 0, 'There is at least one http endpoint' );
-ok( scalar $utils->get_https_support > 0, 'There is at least one https endpoint' );
+ok( scalar $utils->get_http_support('sqs') > 0, 'There is at least one http endpoint' );
+ok( scalar $utils->get_https_support('sqs') > 0, 'There is at least one https endpoint' );
 
 # Test specific services
 
-#ok( is_service_supported
+ok( $utils->is_service_supported( 'us-west-1', 'ec2' ), 'us-west-1->ec2 exists.' );
+ok( $utils->is_service_supported( 'us-west-1', 's3' ), 'us-west-1->s3 exists.' );
+ok( $utils->is_service_supported( 'us-west-1', 'sqs' ), 'us-west-1->sqs' );
+ok( $utils->is_service_supported( 'us-west-1', 'glacier' ), 'us-west-1->glacier' );
 
-#get_service_endpoint is_service_supported has_http_endpoint has_https_endpoint );
+# Test specific endpoints
+
+ok( $utils->has_http_endpoint( 'us-west-1', 'glacier' ), 'us-west-1->glacier has http endpoint.' );
+ok( $utils->has_https_endpoint( 'us-west-1', 'glacier' ), 'us-west-1->glacier has https endpoint.' );
