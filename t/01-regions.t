@@ -22,11 +22,10 @@ can_ok( $utils, @methods );
 # Test https://raw.githubusercontent.com/aws/aws-sdk-android-v2/master/src/com/amazonaws/regions/regions.xml
 
 # Test Regions
-my @regions = $utils->get_regions();
-ok( scalar @regions > 0, 'Regions returns at least one region.' );
-is( grep( /^us-east-1$/, @regions ), 1, 'Region us-east-1 shall always exist.');
-is( grep( /^us-west-1$/, @regions ), 1, 'Region us-west-1 shall always exist.');
-is( grep( /^us-west-2$/, @regions ), 1, 'Region us-west-2 shall always exist.');
+ok( scalar $utils->get_regions() > 0, 'Regions returns at least one region.' );
+is( grep( /^us-east-1$/, $utils->get_regions() ), 1, 'Region us-east-1 shall always exist.');
+is( grep( /^us-west-1$/, $utils->get_regions() ), 1, 'Region us-west-1 shall always exist.');
+is( grep( /^us-west-2$/, $utils->get_regions() ), 1, 'Region us-west-2 shall always exist.');
 
 # Test Services
 my @services = $utils->get_services();
@@ -67,7 +66,7 @@ ok( scalar $utils->get_https_support( 'sqs', 'us-west-1', 'us-east-1' ) == 2, 'T
 
 # Test specific services
 
-ok( $utils->is_service_supported( 'us-west-1', 'ec2' ), 'us-west-1->ec2 exists.' );
+ok( $utils->is_service_supported( 'ec2', 'us-west-1' ), 'us-west-1->ec2 exists.' );
 ok( $utils->is_service_supported( 'us-west-1', 's3' ), 'us-west-1->s3 exists.' );
 ok( $utils->is_service_supported( 'us-west-1', 'sqs' ), 'us-west-1->sqs' );
 ok( $utils->is_service_supported( 'us-west-1', 'glacier' ), 'us-west-1->glacier' );
