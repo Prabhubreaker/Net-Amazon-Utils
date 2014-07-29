@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 42;
+use Test::More tests => 43;
 
 use lib '../lib';
 
@@ -82,4 +82,4 @@ ok( $utils->has_protocol_endpoint( 'Http', 'glacier', 'us-west-1' ), 'us-west-1-
 
 # Test assembling uris
 
-ok( $utils->get_endpoint_uris( 'Http', 'glacier', 'us-west-1' ), 'http://glacier.us-west-1.amazonaws.com' );
+is( ($utils->get_endpoint_uris( 'Http', 'glacier', 'us-west-1' ))[0], 'http://glacier.us-west-1.amazonaws.com', 'Correct URI for http glacier on us-west-1' );
