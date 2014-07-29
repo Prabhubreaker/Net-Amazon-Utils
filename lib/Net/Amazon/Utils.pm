@@ -308,7 +308,7 @@ Returns a list of known endpoint protocols.
 sub get_known_protocols {
 	my ( $self ) = @_;
 	
-	return @{$self->{Protocols}};
+	return @{$self->{regions}->{Protocols}};
 }
 
 =head2 set_known_protocols ( @protocols )
@@ -324,7 +324,7 @@ sub set_known_protocols {
 	
 	croak 'Protocols must be specified.' unless @protocols;
 	
-	$self->{Protocols} = \@protocols;
+	$self->{regions}->{Protocols} = \@protocols;
 	
 	return @protocols;
 }
