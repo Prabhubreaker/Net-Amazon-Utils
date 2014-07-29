@@ -292,13 +292,14 @@ Returns a list of known endpoint protocols.
 sub get_known_protocols {
 	my ( $self ) = @_;
 	
-	return $self->{Protocols};
+	return @{$self->{Protocols}};
 }
 
 =head2 set_known_protocols ( @protocols )
 
 Sets the list of known protocols. Should not be used unless Net::Amazon::Utils::Regions is really
 outdated or you are really brave and probably reckless.
+Returns the newly set protocols.
 
 =cut
 
@@ -307,7 +308,9 @@ sub set_known_protocols {
 	
 	croak 'Protocols must be specified.' unless @protocols;
 	
-	$self->{Protocols} = @protocols;
+	$self->{Protocols} = \@protocols;
+	
+	return @protocols;
 }
 
 =head2 reset_known_protocols
