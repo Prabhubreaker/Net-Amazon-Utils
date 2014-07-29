@@ -22,6 +22,8 @@ our $VERSION = '0.01';
 
 =head1 SYNOPSIS
 
+Loosely based in com.amazonaws.regions.Region at L<http://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/regions/Region.html>
+
 Quick summary of what the module does.
 
 Perhaps a little code snippet.
@@ -194,7 +196,7 @@ A region or list of regions can be specified to narrow down the results.
 
 =cut
 
-sub get_protocol_support {
+sub get_protocol_support {	
 	my ( $self, $protocol, $service, @regions ) = @_;
 	
 	croak 'A protocol must be specified' unless defined $protocol;
@@ -206,6 +208,7 @@ sub get_protocol_support {
 	
 	my $regions_key = join('||', sort @regions);
 	
+
 	my @protocol_support;
 	
 	unless ( defined $self->{regions}->{$protocol . 'Support'}->{$service}->{$regions_key} ) {
