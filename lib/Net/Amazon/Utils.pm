@@ -2,7 +2,7 @@ package Net::Amazon::Utils;
 
 use v5.10.0;
 use strict;
-use warnings;# FATAL => 'all';
+use warnings FATAL => 'all';
 use Carp;
 use LWP::UserAgent;
 use LWP::Protocol::https;
@@ -33,14 +33,9 @@ Perhaps a little code snippet.
     my $foo = Net::Amazon::Utils->new();
     ...
 
-=head1 EXPORT
-
-A list of functions that can be exported.  You can delete this section
-if you don't export anything, such as for a purely object-oriented module.
-
 =head1 SUBROUTINES/METHODS
 
-=head2 new( $no_cache, $no_inet )
+=head2 new( [ $no_cache = 0 ], [ $no_inet = 1 ] )
 
 Spawns a blessed Net::Amazon::Utils minion.
 
@@ -150,6 +145,8 @@ Returns a list of the available services endpoints.
 
 sub get_service_endpoints {
 	my ( $self, $service ) = @_;
+	
+	croak 'A service must be specified' unless defined $service;
 
 	$self->_load_regions();
 	
