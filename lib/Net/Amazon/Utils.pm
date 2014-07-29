@@ -67,7 +67,6 @@ sub new {
 	};
 	
 	bless $self, $class;
-	$self->reset_known_protocols();
 	
 	return $self;
 }
@@ -261,7 +260,7 @@ sub is_service_supported {
 	foreach my $region ( @regions ) {
 		my $supported_in_this_region = 0;
 		foreach my $protocol ( $self->get_known_protocols() ) {
-			$supported_in_this_region ||= $self->_is_true( $self->{regions}->{Region}->{$region}->{Endpoint}->{$protocol} );
+			$supported_in_this_region ||= $self->_is_true( $self->{regions}->{Regions}->{$region}->{Endpoint}->{$protocol} );
 			last if $supported_in_this_region;
 		}
 		$support &&= $supported_in_this_region;
@@ -407,6 +406,8 @@ sub _load_regions {
 			$new_regions->{Services} = $new_regions->{Services}->{Service};
 			
 			$self->{regions} = $new_regions if ( defined $new_regions );
+			# Create a set of correct protocols for this set
+			$self->reset_known_protocols();
 		} else {
 			croak "Region file format cannot be trusted.";
 		}
