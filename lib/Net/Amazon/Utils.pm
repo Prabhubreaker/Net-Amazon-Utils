@@ -167,9 +167,9 @@ sub get_http_support {
 	
 	croak 'A service must be specified' unless defined $service;
 	
-	@regions = sort keys $self->{regions}->{Regions} unless ( @regions );
+	@regions = keys $self->{regions}->{Regions} unless ( @regions );
 	
-	my $regions_key = join('||', @regions);
+	my $regions_key = join('||', sort @regions);
 	
 	$self->_load_regions();
 	
@@ -202,30 +202,38 @@ A region or list of regions can be specified to narrow down the results.
 sub get_https_support {
 	my ( $self, $service, @regions ) = @_;
 	
+	return $self->get_protocol_support( 'Https', $service, @regions );
+}
+
+sub get_protocol_support {
+	my ( $self, $protocol, $service, @regions ) = @_;
+	
+	croak 'A protocol must be specified' unless defined $protocol;
 	croak 'A service must be specified' unless defined $service;
 	
-	@regions = sort keys $self->{regions}->{Regions} unless ( @regions );
+	@regions = keys $self->{regions}->{Regions} unless ( @regions );
 	
-	my $regions_key = join('||', @regions);
+	my $regions_key = join('||', sort @regions);
 
 	$self->_load_regions();
 	
 	my @https_support;
 	
-	unless ( defined $self->{regions}->{HttpsSupport}->{$service}->{$regions_key} ) {
+	unless ( defined $self->{regions}->{$protocol . 'Support'}->{$service}->{$regions_key} ) {
 		foreach my $region ( keys $self->{regions}->{Regions} ) {
 			push @https_support, $self->{regions}->{Regions}->{$region}->{Endpoint}->{$service}->{Hostname}
 				if (
 					defined $self->{regions}->{Regions}->{$region}->{Endpoint}->{$service} &&
-					$self->{regions}->{Regions}->{$region}->{Endpoint}->{$service}->{Https} eq 'true'
+					$self->{regions}->{Regions}->{$region}->{Endpoint}->{$service}->{$protocol} eq 'true'
 				);
 		}
-		$self->{regions}->{HttpsSupport}->{$service}->{$regions_key} = \@https_support;
+		$self->{regions}->{$protocol . 'Support'}->{$service}->{$regions_key} = \@https_support;
 	}
 	
-	return @{$self->{regions}->{HttpsSupport}->{$service}->{$regions_key}};
+	return @{$self->{regions}->{$protocol . 'Support'}->{$service}->{$regions_key}};
 
 	$self->_unload_regions();
+	
 }
 
 =head2 get_service_endpoint
@@ -392,6 +400,18 @@ sub _get_regions_file_raw {
 	return $self->{regions};
 
 	$self->_unload_regions();
+}
+
+=head2 _is_true
+
+Returns a true value on strings that should be true in regions.xml parlance.
+
+=cut
+
+sub _is_true {
+	my ( $self, $supposed_truth );
+	
+	return $supposed_truth eq 'true';
 }
 
 =head1 AUTHOR
