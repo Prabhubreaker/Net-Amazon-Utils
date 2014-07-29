@@ -208,11 +208,10 @@ sub get_protocol_support {
 	
 	my $regions_key = join('||', sort @regions);
 	
-
 	my @protocol_support;
 	
 	unless ( defined $self->{regions}->{$protocol . 'Support'}->{$service}->{$regions_key} ) {
-		foreach my $region ( keys $self->{regions}->{Regions} ) {
+		foreach my $region ( @regions ) {
 			push @protocol_support, $self->{regions}->{Regions}->{$region}->{Endpoint}->{$service}->{Hostname}
 				if (
 					defined $self->{regions}->{Regions}->{$region}->{Endpoint}->{$service} &&
