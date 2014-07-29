@@ -96,6 +96,8 @@ sub fetch_region_update {
 
 =head2 get_domain
 
+Currently returns 'amazonaws.com' which is the only supported domain.
+
 =cut
 
 sub get_domain {
@@ -103,6 +105,8 @@ sub get_domain {
 }
 
 =head2 get_regions
+
+Returns a list of short regions names, i.g., us-west-1, us-east-1, eu-west-1, sa-east-1.
 
 =cut
 
@@ -118,6 +122,8 @@ sub get_regions {
 }
 
 =head2 get_services
+
+Returns a list of short services names, i.g., ec2, sqs, glacier.
 
 =cut
 
@@ -274,30 +280,57 @@ sub is_service_supported {
 
 =head2 has_http_endpoint
 
+Returns true if an http endpoint exists for the service on the region or list or regions
+
 =cut
 
 sub has_http_endpoint {
-	my ( $self ) = @_;
+	my ( $self, $service, @regions ) = @_;
 
 	$self->_load_regions();
 
-
+	return $self->has_protocol_endpoint( 'Http', $service, @regions );
 
 	$self->_unload_regions();
 }
 
 =head2 has_https_endpoint
 
+Returns true if an https endpoint exists for the service on the region or list or regions
+
 =cut
 
 sub has_https_endpoint {
-	my ( $self ) = @_;
+	my ( $self, $service, @regions ) = @_;
 
 	$self->_load_regions();
 
-
+	return $self->has_protocol_endpoint( 'Https', $service, @regions );
 
 	$self->_unload_regions();
+}
+
+=head2 has_protocol_endpoint( $protocol, $service, $region, [@regions])
+
+Returns true if an endpoint of the specified protocol exists for the service on the region or list or regions
+
+=cut
+
+sub has_protocol_endpoint {
+	my ( $self, $protocol, $service, @regions ) = @_;
+
+	$self->_load_regions();
+	
+	my $has_protocol = 1;
+	
+	foreach my $region ( @regions ) {
+		$has_protocol &&= $self->_is_true( $self->{regions}->{Regions}->{$region}->{Endpoint}->{$service}->{$protocol} );
+		last unless $has_protocol;
+	}
+
+	$self->_unload_regions();
+	
+	return $has_protocol;
 }
 
 =head2 get_known_protocols
