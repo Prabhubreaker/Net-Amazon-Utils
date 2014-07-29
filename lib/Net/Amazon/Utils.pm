@@ -40,7 +40,12 @@ if you don't export anything, such as for a purely object-oriented module.
 
 =head1 SUBROUTINES/METHODS
 
-=head2 new
+=head2 new( $no_cache, $no_inet )
+
+Spawns a blessed Net::Amazon::Utils minion.
+
+$no_cache means regions will be reloaded with each call to a function and will likely be deprecated.
+$no_inet means regions should never be fetched from the Internet unless forced by fetch_region_update.
 
 =cut
 
@@ -83,7 +88,7 @@ sub fetch_region_update {
 
 	if ( $self->{no_cache} ) {
 		# Cached regions will not be fetched
-		carp 'Fetching updated region update is useless unless no_cache is false. Still I will comply to your orders in case you more intelligent.';
+		carp 'Fetching updated region update is useless unless no_cache is false. Still I will comply to your orders because you are intelligent.';
 		$self->_load_regions( 1 );
 	} else {
 		# Backup and restore Internet connection selection.
@@ -106,7 +111,7 @@ sub get_domain {
 
 =head2 get_regions
 
-Returns a list of short regions names, i.g., us-west-1, us-east-1, eu-west-1, sa-east-1.
+Returns a list of regions abbreviations, i.g., us-west-1, us-east-1, eu-west-1, sa-east-1.
 
 =cut
 
@@ -123,7 +128,7 @@ sub get_regions {
 
 =head2 get_services
 
-Returns a list of short services names, i.g., ec2, sqs, glacier.
+Returns a list of services abbreviations, i.g., ec2, sqs, glacier.
 
 =cut
 
@@ -167,8 +172,8 @@ sub get_service_endpoints {
 
 =head2 get_http_support( $service, [ @regions ] )
 
-Returns a list of the available http services endpoints for a service short name as returned by
-get_services.
+Returns a list of the available http services endpoints for a service abbreviation
+as returned by get_services.
 A region or list of regions can be specified to narrow down the results.
 
 =cut
@@ -181,9 +186,10 @@ sub get_http_support {
 
 =head2 get_https_support( $service, [ @regions ] )
 
-Returns a list of the available https services endpoints for a service short name as returned by
-get_services.
-A region or list of regions can be specified to narrow down the results.
+@regions is an optional list of regions to narrow down the results.
+
+Returns a list of the available https services endpoints for a service abbreviation
+as returned by get_services.
 
 =cut
 
@@ -195,9 +201,10 @@ sub get_https_support {
 
 =head2 get_protocol_support( $protocol, $service, [ @regions ] )
 
-Returns a list of the available services endpoints for a service short name as returned by
-get_services for a given protocol. Protocols should be cased according
-A region or list of regions can be specified to narrow down the results.
+@regions is an optional list of regions to narrow down the results.
+
+Returns a list of the available services endpoints for a service abbreviation as
+returned by get_services for a given protocol. Protocols should be cased accordingly.
 
 =cut
 
@@ -302,7 +309,7 @@ sub is_service_supported {
 	return $support;
 }
 
-=head2 has_http_endpoint
+=head2 has_http_endpoint( $service, @regions )
 
 $service is a service abbreviation as returned by get_services.
 @regions is a list of regions as returned by get_regions.
@@ -321,7 +328,7 @@ sub has_http_endpoint {
 	$self->_unload_regions();
 }
 
-=head2 has_https_endpoint
+=head2 has_https_endpoint( $service, @regions )
 
 $service is a service abbreviation as returned by get_services.
 @regions is a list of regions as returned by get_regions.
@@ -352,6 +359,10 @@ Returns true if an endpoint of the specified protocol exists for the service on 
 
 sub has_protocol_endpoint {
 	my ( $self, $protocol, $service, @regions ) = @_;
+	
+	croak 'A protocol must be specified.' unless $protocol;
+	croak 'A service must be specified' unless defined $service;
+	croak 'At least one region must be specified' unless @regions;
 
 	$self->_load_regions();
 	
@@ -369,7 +380,7 @@ sub has_protocol_endpoint {
 
 =head2 get_known_protocols
 
-Returns a list of known endpoint protocols, e.g. Http, Https (note casing)
+Returns a list of known endpoint protocols, e.g. Http, Https (note casing).
 
 =cut
 
@@ -412,7 +423,7 @@ sub reset_known_protocols {
 	$self->set_known_protocols( 'Http', 'Https' );
 }
 
-=head2 get_endpoint_uris
+=head2 get_endpoint_uris( $protocol, $service, @regions )
 
 $protocol is a protocol as returned by get_known_protocols.
 $service is a service abbreviation as returned by get_services.
@@ -429,6 +440,8 @@ sub get_endpoint_uris {
 	croak 'A service must be specified' unless defined $service;
 	croak 'At least one region must be specified' unless @regions;
 	
+	$self->_load_regions();
+	
 	my @endpoint_uris;
 	my $domain = $self->get_domain();
 	
@@ -441,6 +454,8 @@ sub get_endpoint_uris {
 	}
 	
 	return @endpoint_uris;
+	
+	$self->_unload_regions();
 }
 
 =head1 Internal Functions
