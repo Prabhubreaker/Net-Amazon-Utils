@@ -62,10 +62,12 @@ sub new {
 			timeout => 30,
 			max_redirect => 0,
 		),
-		# known protocols
-		Protocols => ( 'Http', 'Https' ),
 	};
-	return bless $self, $class;
+	
+	bless $self, $class;
+	$self->reset_known_protocols();
+	
+	return $self;
 }
 
 =head2 fetch_regions_update
@@ -306,6 +308,19 @@ sub set_known_protocols {
 	croak 'Protocols must be specified.' unless @protocols;
 	
 	$self->{Protocols} = @protocols;
+}
+
+=head2 reset_known_protocols
+
+Sets the list of known protocols to Net::Amazon::Utils::Regions defaults.
+Should fix bad set_known_protocols.
+
+=cut
+
+sub reset_known_protocols {
+	my ( $self) = @_;
+	
+	$self->set_known_protocols( 'Http', 'Https' );
 }
 
 =head1 Internal Functions
