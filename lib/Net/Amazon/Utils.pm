@@ -62,6 +62,8 @@ sub new {
 			timeout => 30,
 			max_redirect => 0,
 		),
+		# known protocols
+		Protocols => ( 'Http', 'Https' ),
 	};
 	return bless $self, $class;
 }
@@ -165,30 +167,7 @@ A region or list of regions can be specified to narrow down the results.
 sub get_http_support {
 	my ( $self, $service, @regions ) = @_;
 	
-	croak 'A service must be specified' unless defined $service;
-	
-	@regions = keys $self->{regions}->{Regions} unless ( @regions );
-	
-	my $regions_key = join('||', sort @regions);
-	
-	$self->_load_regions();
-	
-	my @http_support;
-	
-	unless ( defined $self->{regions}->{HttpsSupport}->{$service}->{$regions_key} ) {
-		foreach my $region ( @regions ) {
-			push @http_support, $self->{regions}->{Regions}->{$region}->{Endpoint}->{$service}->{Hostname}
-				if (
-					defined $self->{regions}->{Regions}->{$region}->{Endpoint}->{$service} &&
-					$self->{regions}->{Regions}->{$region}->{Endpoint}->{$service}->{Http} eq 'true'
-				);
-		}
-		$self->{regions}->{HttpSupport}->{$service}->{$regions_key} = \@http_support;
-	}
-	
-	return @{$self->{regions}->{HttpSupport}->{$service}->{$regions_key}};
-
-	$self->_unload_regions();
+	return $self->get_protocol_support( 'Http', $service, @regions );
 }
 
 =head2 get_https_support( $service, [ @regions ] )
@@ -205,6 +184,14 @@ sub get_https_support {
 	return $self->get_protocol_support( 'Https', $service, @regions );
 }
 
+=head2 get_protocol_support( $protocol, $service, [ @regions ] )
+
+Returns a list of the available services endpoints for a service short name as returned by
+get_services for a given protocol. Protocols should be cased according
+A region or list of regions can be specified to narrow down the results.
+
+=cut
+
 sub get_protocol_support {
 	my ( $self, $protocol, $service, @regions ) = @_;
 	
@@ -217,17 +204,19 @@ sub get_protocol_support {
 
 	$self->_load_regions();
 	
-	my @https_support;
+	my @protocol_support;
 	
 	unless ( defined $self->{regions}->{$protocol . 'Support'}->{$service}->{$regions_key} ) {
 		foreach my $region ( keys $self->{regions}->{Regions} ) {
-			push @https_support, $self->{regions}->{Regions}->{$region}->{Endpoint}->{$service}->{Hostname}
+			push @protocol_support, $self->{regions}->{Regions}->{$region}->{Endpoint}->{$service}->{Hostname}
 				if (
 					defined $self->{regions}->{Regions}->{$region}->{Endpoint}->{$service} &&
-					$self->{regions}->{Regions}->{$region}->{Endpoint}->{$service}->{$protocol} eq 'true'
+					$self->_is_true( 
+						$self->{regions}->{Regions}->{$region}->{Endpoint}->{$service}->{$protocol}
+					)
 				);
 		}
-		$self->{regions}->{$protocol . 'Support'}->{$service}->{$regions_key} = \@https_support;
+		$self->{regions}->{$protocol . 'Support'}->{$service}->{$regions_key} = \@protocol_support;
 	}
 	
 	return @{$self->{regions}->{$protocol . 'Support'}->{$service}->{$regions_key}};
@@ -290,6 +279,33 @@ sub has_https_endpoint {
 
 
 	$self->_unload_regions();
+}
+
+=head2 get_known_protocols
+
+Returns a list of known endpoint protocols.
+
+=cut
+
+sub get_known_protocols {
+	my ( $self ) = @_;
+	
+	return $self->{Protocols};
+}
+
+=head2 set_known_protocols ( @protocols )
+
+Sets the list of known protocols. Should not be used unless Net::Amazon::Utils::Regions is really
+outdated or you are really brave and probably reckless.
+
+=cut
+
+sub set_known_protocols {
+	my ( $self, @protocols) = @_;
+	
+	croak 'Protocols must be specified.' unless @protocols;
+	
+	$self->{Protocols} = @protocols;
 }
 
 =head1 Internal Functions
