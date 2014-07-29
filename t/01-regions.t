@@ -43,10 +43,14 @@ ok( scalar $utils->get_service_endpoints( 'glacier' ) > 0, 'Service endpoints fo
 
 # Test endpoint protocol support
 
-ok( scalar $utils->get_http_support( 'sqs') > 0, 'There is at least one http endpoint for sqs' );
-ok( scalar $utils->get_https_support( 'sqs') > 0, 'There is at least one https endpoint for sqs' );
-ok( scalar $utils->get_http_support( 'sqs', 'us-west-1', 'us-east-1' ) == 2, 'There is at least two http endpoint for sqs in a list two regions' );
-ok( scalar $utils->get_https_support( 'sqs', 'us-west-1', 'us-east-1' ) == 2, 'There is at least two https endpoint for sqs in a list two regions' );
+ok( scalar $utils->get_http_support( 'sqs') > 0, 'There is at least one http endpoint for sqs.' );
+ok( scalar $utils->get_http_support( 'sqs') > 0, 'There is at least one http endpoint for sqs, cached.' );
+ok( scalar $utils->get_https_support( 'sqs') > 0, 'There is at least one https endpoint for sqs.' );
+ok( scalar $utils->get_https_support( 'sqs') > 0, 'There is at least one https endpoint for sqs, cached.' );
+ok( scalar $utils->get_http_support( 'sqs', 'us-west-1', 'us-east-1' ) == 2, 'There is at least two http endpoint for sqs in a list two regions.' );
+ok( scalar $utils->get_http_support( 'sqs', 'us-west-1', 'us-east-1' ) == 2, 'There is at least two http endpoint for sqs in a list two regions, cached.' );
+ok( scalar $utils->get_https_support( 'sqs', 'us-west-1', 'us-east-1' ) == 2, 'There is at least two https endpoint for sqs in a list two regions.' );
+ok( scalar $utils->get_https_support( 'sqs', 'us-west-1', 'us-east-1' ) == 2, 'There is at least two https endpoint for sqs in a list two regions, cached.' );
 
 # Test specific services
 
