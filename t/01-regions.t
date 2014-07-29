@@ -46,7 +46,7 @@ ok( scalar $utils->get_service_endpoints( 'glacier' ) > 0, 'Service endpoints fo
 ok( scalar $utils->get_known_protocols() == 2, 'There are two known protocols.' );
 my @protocols = $utils->get_known_protocols();
 ok( scalar $utils->set_known_protocols( 'Http' ) == 1, 'Sets a single protocol.' );
-ok( scalar $utils->set_known_protocols( @protocols ) == 1, 'Sets two protocols.' );
+ok( scalar $utils->set_known_protocols( @protocols ) == 2, 'Sets two protocols.' );
 ok( scalar $utils->get_known_protocols() == 2, 'Protocols ok after user reset.' );
 $utils->reset_known_protocols();
 ok( scalar $utils->get_known_protocols() == 2, 'Protocols ok after class reset.' );
@@ -58,6 +58,8 @@ ok( scalar $utils->get_http_support( 'sqs') > 0, 'There is at least one http end
 ok( scalar $utils->get_http_support( 'sqs') > 0, 'There is at least one http endpoint for sqs, cached.' );
 ok( scalar $utils->get_https_support( 'sqs') > 0, 'There is at least one https endpoint for sqs.' );
 ok( scalar $utils->get_https_support( 'sqs') > 0, 'There is at least one https endpoint for sqs, cached.' );
+ok( scalar $utils->get_http_support( 'sqs', 'us-west-1' ) == 1, 'There is one http endpoint for sqs in a single region.' );
+ok( scalar $utils->get_http_support( 'sqs', 'us-west-1' ) == 1, 'There is one https endpoint for sqs in a single region.' );
 ok( scalar $utils->get_http_support( 'sqs', 'us-west-1', 'us-east-1' ) == 2, 'There is at least two http endpoint for sqs in a list two regions.' );
 ok( scalar $utils->get_http_support( 'sqs', 'us-west-1', 'us-east-1' ) == 2, 'There is at least two http endpoint for sqs in a list two regions, cached.' );
 ok( scalar $utils->get_https_support( 'sqs', 'us-west-1', 'us-east-1' ) == 2, 'There is at least two https endpoint for sqs in a list two regions.' );
