@@ -13,7 +13,7 @@ BEGIN {
 	use_ok( 'Net::Amazon::Utils::Regions' );
 }
 
-my $utils = Net::Amazon::Utils->new( 1, 1 );
+my $utils = Net::Amazon::Utils->new( 0, 1 );
 my @methods = qw( get_regions fetch_region_update
 		get_services get_service_endpoints get_http_support get_https_support
 		get_service_endpoint is_service_supported has_http_endpoint has_https_endpoint has_protocol_endpoint
