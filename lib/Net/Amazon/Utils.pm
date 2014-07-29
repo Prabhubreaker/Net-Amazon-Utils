@@ -243,16 +243,30 @@ sub get_service_endpoint {
 	$self->_unload_regions();
 }
 
-=head2 is_service_supported
+=head2 is_service_supported( $service, @regions )
+
+Return true if the service is supported in all listed regions.
 
 =cut
 
 sub is_service_supported {
-	my ( $self ) = @_;
+	my ( $self, $service, @regions ) = @_;
+	my $support = 1;
+	
+	croak 'A service must be specified' unless defined $service;
+	croak 'At leat one region must be specified' unless @regions;
 
 	$self->_load_regions();
-
-
+	
+	foreach my $region ( @regions ) {
+		my $supported_in_this_region = 0;
+		foreach my $protocol ( $self->get_known_protocols() ) {
+			$supported_in_this_region ||= $self->_is_true( $self->{regions}->{Region}->{$region}->{Endpoint}->{$protocol} );
+			last if $supported_in_this_region;
+		}
+		$support &&= $supported_in_this_region;
+		last unless $support;
+	}
 
 	$self->_unload_regions();
 }
