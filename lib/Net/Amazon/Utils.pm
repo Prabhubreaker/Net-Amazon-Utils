@@ -167,9 +167,7 @@ sub get_http_support {
 	
 	croak 'A service must be specified' unless defined $service;
 	
-	unless ( @regions ) {
-		@regions = keys $self->{regions}->{Regions}
-	}
+	@regions = sort keys $self->{regions}->{Regions} unless ( @regions );
 	
 	my $regions_key = join('||', @regions);
 	
@@ -206,9 +204,7 @@ sub get_https_support {
 	
 	croak 'A service must be specified' unless defined $service;
 	
-	unless ( @regions ) {
-		@regions = keys $self->{regions}->{Regions}
-	}
+	@regions = sort keys $self->{regions}->{Regions} unless ( @regions );
 	
 	my $regions_key = join('||', @regions);
 
