@@ -36,15 +36,17 @@ ok( grep( /^s3$/, @services ), 'Service s3 shall always exist.');
 ok( grep( /^sqs$/, @services ), 'Service sqs shall always exist.');
 ok( grep( /^glacier$/, @services ), 'Service glacier shall always exist.');
 
-ok( scalar $utils->get_service_endpoints('ec2') > 0, 'Service endpoints for ec2 exist.' );
-ok( scalar $utils->get_service_endpoints('s3') > 0, 'Service endpoints for s3 exist.' );
-ok( scalar $utils->get_service_endpoints('sqs') > 0, 'Service endpoints for sqs exist.' );
-ok( scalar $utils->get_service_endpoints('glacier') > 0, 'Service endpoints for glacier exist.' );
+ok( scalar $utils->get_service_endpoints( 'ec2' ) > 0, 'Service endpoints for ec2 exist.' );
+ok( scalar $utils->get_service_endpoints( 's3' ) > 0, 'Service endpoints for s3 exist.' );
+ok( scalar $utils->get_service_endpoints( 'sqs' ) > 0, 'Service endpoints for sqs exist.' );
+ok( scalar $utils->get_service_endpoints( 'glacier' ) > 0, 'Service endpoints for glacier exist.' );
 
 # Test endpoint protocol support
 
-ok( scalar $utils->get_http_support('sqs') > 0, 'There is at least one http endpoint' );
-ok( scalar $utils->get_https_support('sqs') > 0, 'There is at least one https endpoint' );
+ok( scalar $utils->get_http_support( 'sqs') > 0, 'There is at least one http endpoint for sqs' );
+ok( scalar $utils->get_https_support( 'sqs') > 0, 'There is at least one https endpoint for sqs' );
+ok( scalar $utils->get_http_support( 'sqs', 'us-west-1', 'us-east-1' ) == 2, 'There is at least two http endpoint for sqs in a list two regions' );
+ok( scalar $utils->get_https_support( 'sqs', 'us-west-1', 'us-east-1' ) == 2, 'There is at least two https endpoint for sqs in a list two regions' );
 
 # Test specific services
 
