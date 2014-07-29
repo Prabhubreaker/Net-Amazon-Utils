@@ -443,7 +443,7 @@ Returns a true value on strings that should be true in regions.xml parlance.
 =cut
 
 sub _is_true {
-	my ( $self, $supposed_truth );
+	my ( $self, $supposed_truth ) = @_;
 	
 	return $supposed_truth eq 'true';
 }
