@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 28;
+use Test::More tests => 42;
 
 use lib '../lib';
 
@@ -73,6 +73,6 @@ ok( $utils->is_service_supported( 'glacier', 'us-west-1' ), 'us-west-1->glacier'
 
 # Test specific endpoints
 
-ok( $utils->has_http_endpoint( 'us-west-1', 'glacier' ), 'us-west-1->glacier has http endpoint.' );
-ok( $utils->has_https_endpoint( 'us-west-1', 'glacier' ), 'us-west-1->glacier has https endpoint.' );
-ok( $utils->has_protocol_endpoint( 'Http', 'us-west-1', 'glacier' ), 'us-west-1->glacier has https endpoint.' );
+ok( $utils->has_http_endpoint( 'glacier', 'us-west-1', ), 'us-west-1->glacier has http endpoint.' );
+ok( $utils->has_https_endpoint( 'glacier', 'us-west-1', ), 'us-west-1->glacier has https endpoint.' );
+ok( $utils->has_protocol_endpoint( 'Http', 'glacier', 'us-west-1' ), 'us-west-1->glacier has https endpoint check generic function.' );
