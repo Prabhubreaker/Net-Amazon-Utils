@@ -234,21 +234,45 @@ sub get_protocol_support {
 	
 }
 
-=head2 get_service_endpoint
+=head2 get_service_endpoint( $protocol, $service, @regions )
+
+$protocol is a protocol as returned by get_known_protocols.
+$service is a service abbreviation as returned by get_services.
+@regions is a list of regions as returned by get_regions.
+
+Returns the list of endpoints for the specified protocol and service on a list of regions.
 
 =cut
 
 sub get_service_endpoint {
-	my ( $self ) = @_;
+	my ( $self, $protocol, $service, @regions ) = @_;
+
+	croak 'A protocol must be specified' unless defined $protocol;
+	croak 'A service must be specified' unless defined $service;
+	croak 'At least one region must be specified' unless @regions;
 
 	$self->_load_regions();
-
-
+	
+	my @endpoints;
+	
+	foreach my $region ( @regions ) {
+		push @endpoints, $self->{regions}->{Regions}->{$region}->{Endpoint}->{$service}->{Hostname}
+			if (
+				$self->_is_true( 
+					$self->{regions}->{Regions}->{$region}->{Endpoint}->{$service}->{$protocol}
+				)
+			);
+	}
 
 	$self->_unload_regions();
+	
+	return @endpoints;
 }
 
 =head2 is_service_supported( $service, @regions )
+
+$service is a service abbreviation as returned by get_services.
+@regions is a list of regions as returned by get_regions.
 
 Returns true if the service is supported in all listed regions.
 
@@ -259,7 +283,7 @@ sub is_service_supported {
 	my $support = 1;
 	
 	croak 'A service must be specified' unless defined $service;
-	croak 'At leat one region must be specified' unless @regions;
+	croak 'At least one region must be specified' unless @regions;
 
 	$self->_load_regions();
 	
@@ -280,6 +304,9 @@ sub is_service_supported {
 
 =head2 has_http_endpoint
 
+$service is a service abbreviation as returned by get_services.
+@regions is a list of regions as returned by get_regions.
+
 Returns true if an http endpoint exists for the service on the region or list or regions
 
 =cut
@@ -296,6 +323,9 @@ sub has_http_endpoint {
 
 =head2 has_https_endpoint
 
+$service is a service abbreviation as returned by get_services.
+@regions is a list of regions as returned by get_regions.
+
 Returns true if an https endpoint exists for the service on the region or list or regions
 
 =cut
@@ -310,7 +340,11 @@ sub has_https_endpoint {
 	$self->_unload_regions();
 }
 
-=head2 has_protocol_endpoint( $protocol, $service, $region, [@regions])
+=head2 has_protocol_endpoint( $protocol, $service, @regions )
+
+$protocol is a protocol as returned by get_known_protocols.
+$service is a service abbreviation as returned by get_services.
+@regions is a list of regions as returned by get_regions.
 
 Returns true if an endpoint of the specified protocol exists for the service on the region or list or regions
 
@@ -335,7 +369,7 @@ sub has_protocol_endpoint {
 
 =head2 get_known_protocols
 
-Returns a list of known endpoint protocols.
+Returns a list of known endpoint protocols, e.g. Http, Https (note casing)
 
 =cut
 
@@ -348,7 +382,9 @@ sub get_known_protocols {
 =head2 set_known_protocols ( @protocols )
 
 Sets the list of known protocols. Should not be used unless Net::Amazon::Utils::Regions is really
-outdated or you are really brave and probably reckless.
+outdated or you are blatantly galant and brave, probably reckless.
+Remember to properly case protocols and rerun test including your set protocols.
+
 Returns the newly set protocols.
 
 =cut
@@ -376,11 +412,45 @@ sub reset_known_protocols {
 	$self->set_known_protocols( 'Http', 'Https' );
 }
 
+=head2 get_endpoint_uris
+
+$protocol is a protocol as returned by get_known_protocols.
+$service is a service abbreviation as returned by get_services.
+@regions is a list of regions as returned by get_regions.
+
+Returns a list of protocol://service.region.domain URIs usable for RESTful fidling.
+
+=cut
+
+sub get_endpoint_uris {
+	my ( $self, $protocol, $service, @regions ) = @_;
+	
+	croak 'A protocol must be specified.' unless $protocol;
+	croak 'A service must be specified' unless defined $service;
+	croak 'At least one region must be specified' unless @regions;
+	
+	my @endpoint_uris;
+	my $domain = $self->get_domain();
+	
+	foreach my $region ( @regions ) {
+		if ( defined $self->_is_true( $self->{regions}->{Regions}->{$region}->{Endpoint}->{$service}->{$protocol} ) ) {
+			push @endpoint_uris, "\L$protocol\E://$service.$region.$domain";
+		} else {
+			croak "An endpoint does not exist for $service in $region with protocol $protocol.";
+		}
+	}
+	
+	return @endpoint_uris;
+}
+
 =head1 Internal Functions
 
-=head2 _load_regions
+=head2 _load_regions( [$force] )
 
-Loads regions from local cached file or the Internet.
+Loads regions from local cached file or the Internet performing reasonable formatting.
+
+$force, does what it should when set.
+
 If Internet fails local cached file is used.
 If loading of new region definitions fail, old regions remain unaffected.
 
@@ -459,7 +529,19 @@ cache_regions set to any true value.
 sub _unload_regions {
 	my ( $self ) = @_;
 
-	$self->{regions} = undef unless $self->{cache_regions};
+	$self->_force_unload_regions unless $self->{cache_regions};
+}
+
+=head2 _force_unload_regions
+
+Unloads regions recovering memory.
+
+=cut
+
+sub _force_unload_regions {
+	my ( $self ) = @_;
+
+	$self->{regions} = undef;
 }
 
 =head2 _get_remote_regions_file_uri
@@ -476,6 +558,8 @@ sub _get_remote_regions_file_uri {
 
 =head2 get_regions_file_raw
 
+Returns the full structure (plus possibly cached queries) of the interpreted regions.xml file.
+
 =cut
 
 sub _get_regions_file_raw {
@@ -489,6 +573,8 @@ sub _get_regions_file_raw {
 }
 
 =head2 _is_true
+
+Converts a supposed truth into a true Perl true value if the value should be true perlishly speaking.
 
 Returns a true value on strings that should be true in regions.xml parlance.
 
