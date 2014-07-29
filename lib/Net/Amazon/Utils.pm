@@ -154,49 +154,69 @@ sub get_service_endpoints {
 	$self->_unload_regions();
 }
 
-=head2 get_http_support
+=head2 get_http_support( $service, [ @regions ] )
 
-Returns a list of the available http services endpoints.
+Returns a list of the available http services endpoints for a service short name as returned by
+get_services.
+A region or list of regions can be specified to narrow down the results.
 
 =cut
 
 sub get_http_support {
-	my ( $self, $service ) = @_;
-
+	my ( $self, $service, @regions ) = @_;
+	
+	croak 'A service must be specified' unless defined $service;
+	
+	unless ( @regions ) {
+		@regions = keys $self->{regions}->{Regions}
+	}
+	
+	my $regions_key = join('||', @regions);
+	
 	$self->_load_regions();
 	
 	my @http_support;
 	
-	unless ( defined $self->{regions}->{HttpSupport}->{$service} ) {
-		foreach my $region ( keys $self->{regions}->{Regions} ) {
+	unless ( defined $self->{regions}->{HttpsSupport}->{$service}->{$regions_key} ) {
+		foreach my $region ( @regions ) {
 			push @http_support, $self->{regions}->{Regions}->{$region}->{Endpoint}->{$service}->{Hostname}
 				if (
 					defined $self->{regions}->{Regions}->{$region}->{Endpoint}->{$service} &&
 					$self->{regions}->{Regions}->{$region}->{Endpoint}->{$service}->{Http} eq 'true'
 				);
 		}
-		$self->{regions}->{HttpSupport}->{$service} = \@http_support;
+		$self->{regions}->{HttpSupport}->{$service}->{$regions_key} = \@http_support;
 	}
 	
-	return @{$self->{regions}->{HttpSupport}->{$service}};
+	return @{$self->{regions}->{HttpSupport}->{$service}->{$regions_key}};
 
 	$self->_unload_regions();
 }
 
-=head2 get_https_support
+=head2 get_https_support( $service, [ @regions ] )
 
-Returns a list of the available https services endpoints.
+Returns a list of the available https services endpoints for a service short name as returned by
+get_services.
+A region or list of regions can be specified to narrow down the results.
 
 =cut
 
-sub get_https_support  {
-	my ( $self, $service ) = @_;
+sub get_https_support {
+	my ( $self, $service, @regions ) = @_;
+	
+	croak 'A service must be specified' unless defined $service;
+	
+	unless ( @regions ) {
+		@regions = keys $self->{regions}->{Regions}
+	}
+	
+	my $regions_key = join('||', @regions);
 
 	$self->_load_regions();
 	
 	my @https_support;
 	
-	unless ( defined $self->{regions}->{HttpSupport} && defined $self->{regions}->{HttpsSupport}->{$service} ) {
+	unless ( defined $self->{regions}->{HttpsSupport}->{$service}->{$regions_key} ) {
 		foreach my $region ( keys $self->{regions}->{Regions} ) {
 			push @https_support, $self->{regions}->{Regions}->{$region}->{Endpoint}->{$service}->{Hostname}
 				if (
@@ -204,10 +224,10 @@ sub get_https_support  {
 					$self->{regions}->{Regions}->{$region}->{Endpoint}->{$service}->{Https} eq 'true'
 				);
 		}
-		$self->{regions}->{HttpsSupport}->{$service} = \@https_support;
+		$self->{regions}->{HttpsSupport}->{$service}->{$regions_key} = \@https_support;
 	}
 	
-	return @{$self->{regions}->{HttpsSupport}->{$service}};
+	return @{$self->{regions}->{HttpsSupport}->{$service}->{$regions_key}};
 
 	$self->_unload_regions();
 }
