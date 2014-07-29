@@ -67,11 +67,12 @@ ok( scalar $utils->get_https_support( 'sqs', 'us-west-1', 'us-east-1' ) == 2, 'T
 # Test specific services
 
 ok( $utils->is_service_supported( 'ec2', 'us-west-1' ), 'us-west-1->ec2 exists.' );
-ok( $utils->is_service_supported( 'us-west-1', 's3' ), 'us-west-1->s3 exists.' );
-ok( $utils->is_service_supported( 'us-west-1', 'sqs' ), 'us-west-1->sqs' );
-ok( $utils->is_service_supported( 'us-west-1', 'glacier' ), 'us-west-1->glacier' );
+ok( $utils->is_service_supported( 's3' , 'us-west-1' ), 'us-west-1->s3 exists.' );
+ok( $utils->is_service_supported( 'sqs', 'us-west-1' ), 'us-west-1->sqs' );
+ok( $utils->is_service_supported( 'glacier', 'us-west-1' ), 'us-west-1->glacier' );
 
 # Test specific endpoints
 
 ok( $utils->has_http_endpoint( 'us-west-1', 'glacier' ), 'us-west-1->glacier has http endpoint.' );
 ok( $utils->has_https_endpoint( 'us-west-1', 'glacier' ), 'us-west-1->glacier has https endpoint.' );
+ok( $utils->has_protocol_endpoint( 'Http', 'us-west-1', 'glacier' ), 'us-west-1->glacier has https endpoint.' );
