@@ -41,6 +41,17 @@ ok( scalar $utils->get_service_endpoints( 's3' ) > 0, 'Service endpoints for s3 
 ok( scalar $utils->get_service_endpoints( 'sqs' ) > 0, 'Service endpoints for sqs exist.' );
 ok( scalar $utils->get_service_endpoints( 'glacier' ) > 0, 'Service endpoints for glacier exist.' );
 
+# Test protocol support
+
+ok( scalar $utils->get_known_protocols() == 2, 'There are two known protocols.' );
+my @protocols = $utils->get_known_protocols();
+ok( scalar $utils->set_known_protocols( 'Http' ) == 1, 'Sets a single protocol.' );
+ok( scalar $utils->set_known_protocols( @protocols ) == 1, 'Sets two protocols.' );
+ok( scalar $utils->get_known_protocols() == 2, 'Protocols ok after user reset.' );
+$utils->reset_known_protocols();
+ok( scalar $utils->get_known_protocols() == 2, 'Protocols ok after class reset.' );
+
+
 # Test endpoint protocol support
 
 ok( scalar $utils->get_http_support( 'sqs') > 0, 'There is at least one http endpoint for sqs.' );
