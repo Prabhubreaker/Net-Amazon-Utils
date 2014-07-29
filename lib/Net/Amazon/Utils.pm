@@ -244,7 +244,7 @@ sub get_service_endpoint {
 
 =head2 is_service_supported( $service, @regions )
 
-Return true if the service is supported in all listed regions.
+Returns true if the service is supported in all listed regions.
 
 =cut
 
@@ -260,7 +260,7 @@ sub is_service_supported {
 	foreach my $region ( @regions ) {
 		my $supported_in_this_region = 0;
 		foreach my $protocol ( $self->get_known_protocols() ) {
-			$supported_in_this_region ||= $self->_is_true( $self->{regions}->{Regions}->{$region}->{Endpoint}->{$protocol} );
+			$supported_in_this_region ||= $self->_is_true( $self->{regions}->{Regions}->{$region}->{Endpoint}->{$service}->{$protocol} );
 			last if $supported_in_this_region;
 		}
 		$support &&= $supported_in_this_region;
@@ -268,6 +268,8 @@ sub is_service_supported {
 	}
 
 	$self->_unload_regions();
+	
+	return $support;
 }
 
 =head2 has_http_endpoint
