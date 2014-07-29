@@ -14,7 +14,10 @@ BEGIN {
 }
 
 my $utils = Net::Amazon::Utils->new( 1, 1 );
-my @methods = qw( get_regions fetch_region_update get_services get_service_endpoints get_http_support get_https_support get_service_endpoint is_service_supported has_http_endpoint has_https_endpoint );
+my @methods = qw( get_regions fetch_region_update
+		get_services get_service_endpoints get_http_support get_https_support
+		get_service_endpoint is_service_supported has_http_endpoint has_https_endpoint has_protocol_endpoint
+		get_known_protocols set_known_protocols reset_known_protocols get_endpoint_uris );
 
 isa_ok( $utils, 'Net::Amazon::Utils' );
 can_ok( $utils, @methods );
@@ -75,4 +78,8 @@ ok( $utils->is_service_supported( 'glacier', 'us-west-1' ), 'us-west-1->glacier'
 
 ok( $utils->has_http_endpoint( 'glacier', 'us-west-1', ), 'us-west-1->glacier has http endpoint.' );
 ok( $utils->has_https_endpoint( 'glacier', 'us-west-1', ), 'us-west-1->glacier has https endpoint.' );
-ok( $utils->has_protocol_endpoint( 'Http', 'glacier', 'us-west-1' ), 'us-west-1->glacier has https endpoint check generic function.' );
+ok( $utils->has_protocol_endpoint( 'Http', 'glacier', 'us-west-1' ), 'us-west-1->glacier has an http endpoint when checked with generic function.' );
+
+# Test assembling uris
+
+ok( $utils->get_endpoint_uris( 'Http', 'glacier', 'us-west-1' ), 'http://glacier.us-west-1.amazonaws.com' );
