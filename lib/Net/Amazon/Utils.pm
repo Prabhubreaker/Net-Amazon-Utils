@@ -200,11 +200,11 @@ sub get_protocol_support {
 	croak 'A protocol must be specified' unless defined $protocol;
 	croak 'A service must be specified' unless defined $service;
 	
+	$self->_load_regions();
+	
 	@regions = keys $self->{regions}->{Regions} unless ( @regions );
 	
 	my $regions_key = join('||', sort @regions);
-
-	$self->_load_regions();
 	
 	my @protocol_support;
 	
