@@ -71,8 +71,8 @@ ok( scalar $utils->get_https_support( 'sqs', 'us-west-1', 'us-east-1' ) == 2, 'T
 
 ok( $utils->is_service_supported( 'ec2', 'us-west-1' ), 'us-west-1->ec2 exists.' );
 ok( $utils->is_service_supported( 's3' , 'us-west-1' ), 'us-west-1->s3 exists.' );
-ok( $utils->is_service_supported( 'sqs', 'us-west-1' ), 'us-west-1->sqs' );
-ok( $utils->is_service_supported( 'glacier', 'us-west-1' ), 'us-west-1->glacier' );
+ok( $utils->is_service_supported( 'sqs', 'us-west-1' ), 'us-west-1->sqs exists.' );
+ok( $utils->is_service_supported( 'glacier', 'us-west-1' ), 'us-west-1->glacier exists.' );
 
 # Test specific endpoints
 
