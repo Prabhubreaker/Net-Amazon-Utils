@@ -2,7 +2,20 @@ package Net::Amazon::Utils::Regions;
 
 use strict;
 
-# Generated from L<https://raw.githubusercontent.com/aws/aws-sdk-android-v2/master/src/com/amazonaws/regions/regions.xml>
+=head1 NAME
+
+Net::Amazon::Utils::Regions - Data for Net::Amazon::Utils::Regions.
+Generated from L<https://raw.githubusercontent.com/aws/aws-sdk-android-v2/master/src/com/amazonaws/regions/regions.xml>
+
+=head1 VERSION
+
+Version 0.01
+
+=head2 get_regions_data
+
+Returns the structure of regions.xml.
+
+=cut
 
 sub get_regions_data {
 	my $regions={
