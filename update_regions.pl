@@ -4,6 +4,7 @@ use lib './lib';
 
 use Net::Amazon::Utils;
 use Data::Dumper;
+use DateTime;
 
 my $utils = Net::Amazon::Utils->new(0,0);
 
@@ -30,7 +31,13 @@ LIB->print( "# Generated from L<$uri>\n\n" );
 
 LIB->print( "=head1 VERSION\n\n" );
 
+my $version = DateTime->today->ymd('');
+
 LIB->print( "Version 0.01\n\n" );
+
+LIB->print( "=cut\n\n" );
+
+LIB->print( "our \$VERSION = $version\n\n");
 
 LIB->print( "=head2 get_regions_datan\n\n" );
 
