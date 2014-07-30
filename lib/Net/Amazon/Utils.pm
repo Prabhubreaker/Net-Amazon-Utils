@@ -7,7 +7,6 @@ use Carp;
 use LWP::UserAgent;
 use LWP::Protocol::https;
 
-
 =head1 NAME
 
 Net::Amazon::Utils - Implementation of a set of utilities to help in developing Amazon web service modules in Perl.
@@ -22,16 +21,49 @@ our $VERSION = '0.01';
 
 =head1 SYNOPSIS
 
+This module implements a set of helpers that should be of aid to
+programming client to Amazon RESTful webservices.
+
 Loosely based in com.amazonaws.regions.Region at L<http://docs.aws.amazon.com/AWSJavaSDK/latest/javadoc/com/amazonaws/regions/Region.html>
 
-Quick summary of what the module does.
+	use Net::Amazon::Utils;
 
-Perhaps a little code snippet.
+	my $utils = Net::Amazon::Utils->new();
 
-    use Net::Amazon::Utils;
+	# get a list of all regions
+	my @all_regions = $utils->get_regions();
 
-    my $foo = Net::Amazon::Utils->new();
-    ...
+	# get a list of all services abbreviations
+	my @all_services = $utils->get_services();
+
+	# get all endpoints for ec2
+	my @service_endpoints = $utils->get_service_endpoints( 'ec2' );
+
+	my $endpoint_uri;
+
+	# check that ec2 exists in region us-west-1
+	if ( $utils->is_service_supported( 'ec2', 'us-west-1' ) ) {
+		# check that http is supported by the end point
+		if ( $utils->get_http_support( 'ec2', 'us-west-1' ) ) {
+			# get the first http endpoint for ec2 in region us-west-1
+			$endpoint_uri =($utils->get_endpoint_uris( 'Http', 'ec2', 'us-west-1' ))[0];
+			#... use LWP to POST, send get comments
+			#... use Net::Amazon::EC2
+		}
+	}
+
+	# get endpoints for ec2 with http support on two given regions
+	my @some_endpoints = $utils->get_http_support( 'ec2', 'us-west-1', 'us-east-1' );
+
+	# check ec2 is supported on all us regions
+	my @us_regions = grep( /^us/, $utils->get_regions );
+	my @us_endpoints;
+	if ( $utils->is_service_supported( 'ec2', @us_regions ) ) {
+		# get endpoints for ec2 with http support on all us regions
+		@us_endpoints = $utils->get_http_support( 'ec2', @us_regions );
+		# choose a random one and give you images a spin
+		# ...
+	}
 
 =head1 SUBROUTINES/METHODS
 
@@ -71,7 +103,7 @@ sub new {
 	return $self;
 }
 
-=head2 fetch_regions_update
+=head2 fetch_region_update
 
 Fetch regions file from the internet even if no_inet was specified when
 intanciating the object.
@@ -601,6 +633,12 @@ sub _is_true {
 =head1 AUTHOR
 
 Gonzalo Barco, C<< <gbarco uy at gmail com, no spaces> >>
+
+=head1 TODO
+
+=item * Online tests that endpoints are actually there.
+=item * Better return values when scalar is expected.
+=item * Probably helpers for assembling and signing requests to actual endpoints.
 
 =head1 BUGS
 
