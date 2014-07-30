@@ -13,24 +13,28 @@ BEGIN {
 	use_ok( 'Net::Amazon::Utils::Regions' );
 }
 
+# Test with caching and no Internet connection
+
 my $utils = Net::Amazon::Utils->new( 0, 1 );
 my @methods = qw( get_regions fetch_region_update
 		get_services get_service_endpoints get_http_support get_https_support
 		get_service_endpoint is_service_supported has_http_endpoint has_https_endpoint has_protocol_endpoint
 		get_known_protocols set_known_protocols reset_known_protocols get_endpoint_uris );
 
+# Test object interface
+
 isa_ok( $utils, 'Net::Amazon::Utils' );
 can_ok( $utils, @methods );
 
-# Test https://raw.githubusercontent.com/aws/aws-sdk-android-v2/master/src/com/amazonaws/regions/regions.xml
-
 # Test Regions
+
 ok( scalar $utils->get_regions() > 0, 'Regions returns at least one region.' );
 is( grep( /^us-east-1$/, $utils->get_regions() ), 1, 'Region us-east-1 shall always exist.');
 is( grep( /^us-west-1$/, $utils->get_regions() ), 1, 'Region us-west-1 shall always exist.');
 is( grep( /^us-west-2$/, $utils->get_regions() ), 1, 'Region us-west-2 shall always exist.');
 
 # Test Services
+
 my @services = $utils->get_services();
 isnt( scalar @services, 0, 'Services returns at least one service.' );
 ok( grep( /^ec2$/, @services ), 'Service ec2 shall always exist.');
