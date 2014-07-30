@@ -97,9 +97,9 @@ sub new {
 			max_redirect => 0,
 		),
 	};
-	
+
 	bless $self, $class;
-	
+
 	return $self;
 }
 
@@ -177,13 +177,13 @@ Returns a list of the available services endpoints.
 
 sub get_service_endpoints {
 	my ( $self, $service ) = @_;
-	
+
 	croak 'A service must be specified' unless defined $service;
 
 	$self->_load_regions();
-	
+
 	my @service_endpoints;
-	
+
 	unless ( defined $self->{regions}->{ServiceEndpoints} ) {
 		foreach my $region ( keys $self->{regions}->{Regions} ) {
 			push @service_endpoints, $self->{regions}->{Regions}->{$region}->{Endpoint}->{$service}->{Hostname}
@@ -193,9 +193,9 @@ sub get_service_endpoints {
 		}
 		$self->{regions}->{ServiceEndpoints} = \@service_endpoints;
 	}
-	
+
 	return @{$self->{regions}->{ServiceEndpoints}};
-	
+
 	$self->_unload_regions();
 }
 
@@ -209,7 +209,7 @@ A region or list of regions can be specified to narrow down the results.
 
 sub get_http_support {
 	my ( $self, $service, @regions ) = @_;
-	
+
 	return $self->get_protocol_support( 'Http', $service, @regions );
 }
 
@@ -224,7 +224,7 @@ as returned by get_services.
 
 sub get_https_support {
 	my ( $self, $service, @regions ) = @_;
-	
+
 	return $self->get_protocol_support( 'Https', $service, @regions );
 }
 
@@ -237,37 +237,37 @@ returned by get_services for a given protocol. Protocols should be cased accordi
 
 =cut
 
-sub get_protocol_support {	
+sub get_protocol_support {
 	my ( $self, $protocol, $service, @regions ) = @_;
-	
+
 	croak 'A protocol must be specified' unless defined $protocol;
 	croak 'A service must be specified' unless defined $service;
-	
+
 	$self->_load_regions();
-	
+
 	@regions = keys $self->{regions}->{Regions} unless ( @regions );
-	
+
 	my $regions_key = join('||', sort @regions);
-	
+
 	my @protocol_support;
-	
+
 	unless ( defined $self->{regions}->{$protocol . 'Support'}->{$service}->{$regions_key} ) {
 		foreach my $region ( @regions ) {
 			push @protocol_support, $self->{regions}->{Regions}->{$region}->{Endpoint}->{$service}->{Hostname}
 				if (
 					defined $self->{regions}->{Regions}->{$region}->{Endpoint}->{$service} &&
-					$self->_is_true( 
+					$self->_is_true(
 						$self->{regions}->{Regions}->{$region}->{Endpoint}->{$service}->{$protocol}
 					)
 				);
 		}
 		$self->{regions}->{$protocol . 'Support'}->{$service}->{$regions_key} = \@protocol_support;
 	}
-	
+
 	return @{$self->{regions}->{$protocol . 'Support'}->{$service}->{$regions_key}};
 
 	$self->_unload_regions();
-	
+
 }
 
 =head2 get_service_endpoint( $protocol, $service, @regions )
@@ -288,20 +288,20 @@ sub get_service_endpoint {
 	croak 'At least one region must be specified' unless @regions;
 
 	$self->_load_regions();
-	
+
 	my @endpoints;
-	
+
 	foreach my $region ( @regions ) {
 		push @endpoints, $self->{regions}->{Regions}->{$region}->{Endpoint}->{$service}->{Hostname}
 			if (
-				$self->_is_true( 
+				$self->_is_true(
 					$self->{regions}->{Regions}->{$region}->{Endpoint}->{$service}->{$protocol}
 				)
 			);
 	}
 
 	$self->_unload_regions();
-	
+
 	return @endpoints;
 }
 
@@ -317,12 +317,12 @@ Returns true if the service is supported in all listed regions.
 sub is_service_supported {
 	my ( $self, $service, @regions ) = @_;
 	my $support = 1;
-	
+
 	croak 'A service must be specified' unless defined $service;
 	croak 'At least one region must be specified' unless @regions;
 
 	$self->_load_regions();
-	
+
 	foreach my $region ( @regions ) {
 		my $supported_in_this_region = 0;
 		foreach my $protocol ( $self->get_known_protocols() ) {
@@ -334,7 +334,7 @@ sub is_service_supported {
 	}
 
 	$self->_unload_regions();
-	
+
 	return $support;
 }
 
@@ -388,22 +388,22 @@ Returns true if an endpoint of the specified protocol exists for the service on 
 
 sub has_protocol_endpoint {
 	my ( $self, $protocol, $service, @regions ) = @_;
-	
+
 	croak 'A protocol must be specified.' unless $protocol;
 	croak 'A service must be specified' unless defined $service;
 	croak 'At least one region must be specified' unless @regions;
 
 	$self->_load_regions();
-	
+
 	my $has_protocol = 1;
-	
+
 	foreach my $region ( @regions ) {
 		$has_protocol &&= $self->_is_true( $self->{regions}->{Regions}->{$region}->{Endpoint}->{$service}->{$protocol} );
 		last unless $has_protocol;
 	}
 
 	$self->_unload_regions();
-	
+
 	return $has_protocol;
 }
 
@@ -415,7 +415,7 @@ Returns a list of known endpoint protocols, e.g. Http, Https (note casing).
 
 sub get_known_protocols {
 	my ( $self ) = @_;
-	
+
 	return @{$self->{regions}->{Protocols}};
 }
 
@@ -431,11 +431,11 @@ Returns the newly set protocols.
 
 sub set_known_protocols {
 	my ( $self, @protocols) = @_;
-	
+
 	croak 'Protocols must be specified.' unless @protocols;
-	
+
 	$self->{regions}->{Protocols} = \@protocols;
-	
+
 	return @protocols;
 }
 
@@ -448,7 +448,7 @@ Should fix bad set_known_protocols.
 
 sub reset_known_protocols {
 	my ( $self) = @_;
-	
+
 	$self->set_known_protocols( 'Http', 'Https' );
 }
 
@@ -464,16 +464,16 @@ Returns a list of protocol://service.region.domain URIs usable for RESTful fidli
 
 sub get_endpoint_uris {
 	my ( $self, $protocol, $service, @regions ) = @_;
-	
+
 	croak 'A protocol must be specified.' unless $protocol;
 	croak 'A service must be specified' unless defined $service;
 	croak 'At least one region must be specified' unless @regions;
-	
+
 	$self->_load_regions();
-	
+
 	my @endpoint_uris;
 	my $domain = $self->get_domain();
-	
+
 	foreach my $region ( @regions ) {
 		if ( defined $self->_is_true( $self->{regions}->{Regions}->{$region}->{Endpoint}->{$service}->{$protocol} ) ) {
 			push @endpoint_uris, "\L$protocol\E://$service.$region.$domain";
@@ -481,9 +481,9 @@ sub get_endpoint_uris {
 			croak "An endpoint does not exist for $service in $region with protocol $protocol.";
 		}
 	}
-	
+
 	return @endpoint_uris;
-	
+
 	$self->_unload_regions();
 }
 
@@ -502,7 +502,7 @@ If loading of new region definitions fail, old regions remain unaffected.
 
 sub _load_regions {
 	my ( $self, $force ) = @_;
-	
+
 	if ( $force || !defined $self->{regions} ) {
 		my @xml_options = [ KeyAttr => {Region => 'Name', Endpoint=>'ServiceName', Service => 'Name' } ];
 		my $new_regions;
@@ -553,7 +553,7 @@ sub _load_regions {
 		) {
 			$new_regions->{Regions} = $new_regions->{Regions}->{Region};
 			$new_regions->{Services} = $new_regions->{Services}->{Service};
-			
+
 			$self->{regions} = $new_regions if ( defined $new_regions );
 			# Create a set of correct protocols for this set
 			$self->reset_known_protocols();
@@ -626,7 +626,7 @@ Returns a true value on strings that should be true in regions.xml parlance.
 
 sub _is_true {
 	my ( $self, $supposed_truth ) = @_;
-	
+
 	return $supposed_truth eq 'true';
 }
 
@@ -636,9 +636,15 @@ Gonzalo Barco, C<< <gbarco uy at gmail com, no spaces> >>
 
 =head1 TODO
 
+=over 4
+
 =item * Online tests that endpoints are actually there.
+
 =item * Better return values when scalar is expected.
+
 =item * Probably helpers for assembling and signing requests to actual endpoints.
+
+=back
 
 =head1 BUGS
 
