@@ -150,7 +150,7 @@ sub get_regions {
 
 	$self->_load_regions();
 
-	return keys $self->{regions}->{Regions};
+	return keys %{$self->{regions}->{Regions}};
 
 	$self->_unload_regions();
 }
@@ -166,7 +166,7 @@ sub get_services {
 
 	$self->_load_regions();
 
-	return keys $self->{regions}->{Services};
+	return keys %{$self->{regions}->{Services}};
 
 	$self->_unload_regions();
 }
@@ -187,7 +187,7 @@ sub get_service_endpoints {
 	my @service_endpoints;
 
 	unless ( defined $self->{regions}->{ServiceEndpoints} ) {
-		foreach my $region ( keys $self->{regions}->{Regions} ) {
+		foreach my $region ( keys %{$self->{regions}->{Regions}} ) {
 			push @service_endpoints, $self->{regions}->{Regions}->{$region}->{Endpoint}->{$service}->{Hostname}
 				if (
 					defined $self->{regions}->{Regions}->{$region}->{Endpoint}->{$service}
@@ -247,7 +247,7 @@ sub get_protocol_support {
 
 	$self->_load_regions();
 
-	@regions = keys $self->{regions}->{Regions} unless ( @regions );
+	@regions = keys %{$self->{regions}->{Regions}} unless ( @regions );
 
 	my $regions_key = join('||', sort @regions);
 
