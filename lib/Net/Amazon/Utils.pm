@@ -15,11 +15,11 @@ Net::Amazon::Utils - Implementation of a set of utilities to help in developing 
 
 =head1 VERSION
 
-Version 0.03
+Version 0.21
 
 =cut
 
-our $VERSION = '0.03';
+our $VERSION = '0.21';
 
 =head1 SYNOPSIS
 
