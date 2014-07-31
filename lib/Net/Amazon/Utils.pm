@@ -516,6 +516,7 @@ sub _load_regions {
 			};
 			if ( $@ ) {
 				carp "Processing XML failed with error $@";
+				$error = 1;
 			}
 		} else {
 			my $response = $self->{ua}->get( $self->{remote_region_file},
@@ -526,7 +527,7 @@ sub _load_regions {
 				$self->{region_etag} = $response->header( 'Etag' );
 				# This should be a big file...
 				my $content = $response->decoded_content;
-				carp "Size of region file looks really suspicious." if ( length $content < 10000 );
+				carp "Size of region file looks suspiciously small." if ( length $content < 10000 );
 				eval {
 					my @xml_options = ( KeyAttr => { Region => 'Name', Endpoint=>'ServiceName', Service => 'Name' } );
 					$new_regions = XML::Simple::XMLin( $content, @xml_options );
@@ -555,22 +556,21 @@ sub _load_regions {
 					$error = 1;
 				}
 			}
-			# Retry locally on errors
-			if ( $error ) {
-				my $old_no_inet = $self->{no_inet};
-				carp "Getting regions file from Internet failed will use local cache. Check your Internet connection...";
-				$self->{no_inet} = 1;
-				$self->_load_regions();
-				$self->{no_inet} = $old_no_inet
-			} else {
-				$new_regions->{Regions} = $new_regions->{Regions}->{Region};
-				$new_regions->{Services} = $new_regions->{Services}->{Service};
-
-				$self->{regions} = $new_regions if ( defined $new_regions );
-				# Create a set of correct protocols for this set
-				$self->reset_known_protocols();
-			}
 		}
+		# Retry locally on errors
+		if ( $error ) {
+			my $old_no_inet = $self->{no_inet};
+			carp "Getting regions file from Internet failed will use local cache. Check your Internet connection...";
+			$self->{no_inet} = 1;
+			$self->_load_regions();
+			$self->{no_inet} = $old_no_inet
+		}
+		$new_regions->{Regions} = $new_regions->{Regions}->{Region};
+		$new_regions->{Services} = $new_regions->{Services}->{Service};
+
+		$self->{regions} = $new_regions if ( defined $new_regions );
+		# Create a set of correct protocols for this set
+		$self->reset_known_protocols();
 	}
 }
 
