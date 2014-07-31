@@ -11,6 +11,10 @@ Generated from L<https://raw.githubusercontent.com/aws/aws-sdk-android-v2/master
 
 Version 0.01
 
+=cut
+
+our $VERSION = '200140730';
+
 =head2 get_regions_data
 
 Returns the structure of regions.xml.
@@ -1529,6 +1533,6 @@ sub get_regions_data {
   }
 }
 ;
-	return $regions; 
+	return $regions;
 }
 return 1;
