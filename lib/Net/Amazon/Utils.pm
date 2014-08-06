@@ -641,10 +641,6 @@ sub _is_true {
 	return $supposed_truth eq 'true';
 }
 
-=head1 AUTHOR
-
-Gonzalo Barco, C<< <gbarco uy at gmail com, no spaces> >>
-
 =head1 TODO
 
 =over 4
@@ -656,12 +652,6 @@ Gonzalo Barco, C<< <gbarco uy at gmail com, no spaces> >>
 =item * Probably helpers for assembling and signing requests to actual endpoints.
 
 =back
-
-=head1 BUGS
-
-Please report any bugs or feature requests to C<bug-net-amazon-utils at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Net-Amazon-Utils>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
 
 =head1 SUPPORT
 
@@ -691,7 +681,15 @@ L<http://search.cpan.org/dist/Net-Amazon-Utils/>
 
 =back
 
-=head1 ACKNOWLEDGEMENTS
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-net-amazon-utils at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Net-Amazon-Utils>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+=head1 AUTHOR
+
+Gonzalo Barco, C<< <gbarco uy at gmail com, no spaces> >>
 
 =head1 LICENSE AND COPYRIGHT
 
